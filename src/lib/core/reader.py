@@ -30,9 +30,16 @@ class Reader(Thread):
             print('Unable to open the file')
             sys.exit()
 
+        last_read_line = self.line_read
         # Now put in the queue each line formatted in dictionary by calling the Parser
         for log_line in log_file:
-            self.queue.put(self.parse_log_line(log_line.strip()))
+            if len(log_line) > 0 and log_line.startswith('#'):
+                try:
+                    self.queue.put(self.parse_log_line(log_line.strip()))
+                except LineFormatError:
+                    pass
+                last_read_line += 1
+        self.line_read = last_read_line
 
     def parse_log_line(self, line):
         # We create the pattern and we inject the variable we want for the different parts
