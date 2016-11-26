@@ -1,0 +1,6 @@
+HTTP Log Monitoring
+========================
+
+This project is an http log monitoring and alerting.
+
+Full documentation can be found in the documentation
