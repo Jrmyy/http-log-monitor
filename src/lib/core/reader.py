@@ -2,46 +2,45 @@
 
 import sys
 import re
+from os import SEEK_END
 from datetime import datetime, timedelta
-from queue import Queue
-from threading import Thread
 from src.exceptions.core.exceptions import LineFormatError
+from queue import Queue
+from time import sleep
+from src.lib.core.custom_thread import ContinuousThread
 
 
-class Reader(Thread):
+class Reader(ContinuousThread):
 
-    def __init__(self, log_path, interval=1):
-        Thread.__init__(self)
+    def __init__(self, log_path: str, queue: Queue):
+        super().__init__()
         self.log_path = log_path
-        self.interval = interval
-
-        self.name = 'log line reader'
-        self.line_read = 0
-        self.queue = Queue()
+        self.queue = queue
 
     def run(self):
         # We are trying to open the file and to go the new added lines
         try:
             log_file = open(self.log_path)
-            # We are skipping the lines we have already read
-            for l in range(self.line_read):
-                next(log_file)
         except IOError:
             print('Unable to open the file')
             sys.exit()
 
-        last_read_line = self.line_read
-        # Now put in the queue each line formatted in dictionary by calling the Parser
-        for log_line in log_file:
-            if len(log_line) > 0 and log_line.startswith('#'):
-                try:
-                    self.queue.put(self.parse_log_line(log_line.strip()))
-                except LineFormatError:
-                    pass
-                last_read_line += 1
-        self.line_read = last_read_line
+        # We go at the end of the file
+        log_file.seek(0, SEEK_END)
+        while self.can_run:
+            end_of_file = False
+            while not end_of_file:
+                log_line = log_file.readline()
+                if not log_line:
+                    end_of_file = True
+                    sleep(0.1)
+                else:
+                    try:
+                        self.queue.put(self.parse_log_line(log_line))
+                    except LineFormatError:
+                        sys.exit()
 
-    def parse_log_line(self, line):
+    def parse_log_line(self, line: str) -> dict:
         # We create the pattern and we inject the variable we want for the different parts
         pattern = re.compile(
             r'^(?P<remote_host>\S*) (?P<user_identity>\S*) (?P<user_name>\S*) \[(?P<datetime>.*?)\]'
@@ -65,6 +64,8 @@ class Reader(Thread):
         except ValueError:
             raise LineFormatError("The status code or the response size aren't integers")
 
+        formatted_line['section'] = self.get_section(formatted_line['request'])
+
         # Now we are going to format the date in the native datetime format
         try:
             formatted_line['datetime'] = self.parse_datetime(formatted_line['datetime'])
@@ -72,7 +73,7 @@ class Reader(Thread):
             raise LineFormatError("The date doesn't match with the required format")
         return formatted_line
 
-    def get_section(self, request):
+    def get_section(self, request: str) -> str:
         section = re.match(r'^\S+ (/\S*) \S+', request.strip())
 
         # If the section doesn't match with the regex, we raise a LineFormatError
@@ -89,7 +90,7 @@ class Reader(Thread):
             if part != '':
                 return '/' + str(part)
 
-    def parse_datetime(self, string_datetime):
+    def parse_datetime(self, string_datetime: str) -> datetime:
         datetime_result = datetime.strptime(string_datetime[0:20], '%d/%b/%Y:%X')
 
         # The string date has the following format 01/Jul/1995:00:00:09 -400 so so the basic date is 20 characters long
