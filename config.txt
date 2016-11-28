@@ -1,0 +1,19 @@
+# Log simulator config
+
+log_simulator.file_to_write
+log_simulator.requests
+log_simulator.hostname
+log_simulator.number_sections
+log_simulator.requests_per_second
+
+# Reader config
+
+reader.log_path
+
+# Displayer config
+
+displayer.interval
+
+# Alert system config
+
+alert_system.threshold
