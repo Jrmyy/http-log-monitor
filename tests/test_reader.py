@@ -1,8 +1,9 @@
 import unittest
-from queue import Queue
 from datetime import datetime
-from src.exceptions.core.exceptions import LineFormatError
-from src.lib.core.reader import Reader
+from queue import Queue
+
+from src.exceptions import LineFormatError
+from src.reader import Reader
 
 
 class TestReader(unittest.TestCase):

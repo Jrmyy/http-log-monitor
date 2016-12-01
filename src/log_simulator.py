@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
 
 import sys
+from datetime import datetime
 from random import choice, randint, uniform
 from string import ascii_lowercase
-from datetime import datetime
-from time import strftime, gmtime, sleep
-from src.lib.core.custom_thread import ContinuousThread
+from time import strftime, gmtime
+
+from src.custom_thread import ContinuousThread
 
 
 class LogSimulator(ContinuousThread):
 
-    def __init__(self, file_to_write: str, request_per_second: int):
+    def __init__(self, file_to_write: str, requests_per_second: int):
         super().__init__()
         self.file_to_write = file_to_write
         self.requests = ['GET', 'PUT', 'POST', 'HEAD', 'OPTIONS']
         self.hostname = 'localhost'
         self.sections = ['/', '/section1', '/section2', '/section3']
-        self.requests_per_second = request_per_second
+        self.requests_per_second = requests_per_second
 
     def run(self):
         if self.requests_per_second != 0:

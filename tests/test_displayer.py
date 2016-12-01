@@ -1,11 +1,12 @@
 import unittest
 from queue import Queue
-from src.lib.core.displayer import Displayer
+
+from src.stats_displayer import StatisticalDisplayer
 
 
-class TestDisplayer(unittest.TestCase):
+class TestStatisticalDisplayer(unittest.TestCase):
 
-    displayer = Displayer(Queue(), 1)
+    displayer = StatisticalDisplayer(Queue(), {}, 1)
     display_information = {
         'section': '/',
         'hits': '2',

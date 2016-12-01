@@ -1,6 +1,7 @@
-import unittest
-from src.lib.simulation.log_simulator import LogSimulator
 import re
+import unittest
+
+from src.log_simulator import LogSimulator
 
 
 class TestLogSimulator(unittest.TestCase):

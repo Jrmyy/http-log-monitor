@@ -1,2 +1,0 @@
-class LineFormatError(Exception):
-    pass

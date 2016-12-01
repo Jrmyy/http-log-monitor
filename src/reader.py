@@ -1,21 +1,22 @@
 # -*- coding: utf-8 -*-
 
-import sys
 import re
-from os import SEEK_END
+import sys
 from datetime import datetime, timedelta
-from src.exceptions.core.exceptions import LineFormatError
-from queue import Queue
+from os import SEEK_END
 from time import sleep
-from src.lib.core.custom_thread import ContinuousThread
+
+from src.custom_thread import ContinuousThread
+from src.exceptions import LineFormatError
 
 
 class Reader(ContinuousThread):
 
-    def __init__(self, log_path: str, queue: Queue):
+    def __init__(self, log_path, read_line_queue, total_traffic_hits_queue):
         super().__init__()
         self.log_path = log_path
-        self.queue = queue
+        self.read_line_queue = read_line_queue
+        self.total_traffic_hits_queue = total_traffic_hits_queue
 
     def run(self):
         # We are trying to open the file and to go the new added lines
@@ -36,11 +37,13 @@ class Reader(ContinuousThread):
                     sleep(0.1)
                 else:
                     try:
-                        self.queue.put(self.parse_log_line(log_line))
+                        parsed_line = self.parse_log_line(log_line)
+                        self.read_line_queue.put(parsed_line)
+                        self.total_traffic_hits_queue.put(parsed_line['datetime'])
                     except LineFormatError:
                         sys.exit()
 
-    def parse_log_line(self, line: str) -> dict:
+    def parse_log_line(self, line):
         # We create the pattern and we inject the variable we want for the different parts
         pattern = re.compile(
             r'^(?P<remote_host>\S*) (?P<user_identity>\S*) (?P<user_name>\S*) \[(?P<datetime>.*?)\]'
@@ -73,7 +76,7 @@ class Reader(ContinuousThread):
             raise LineFormatError("The date doesn't match with the required format")
         return formatted_line
 
-    def get_section(self, request: str) -> str:
+    def get_section(self, request):
         section = re.match(r'^\S+ (/\S*) \S+', request.strip())
 
         # If the section doesn't match with the regex, we raise a LineFormatError
@@ -90,7 +93,7 @@ class Reader(ContinuousThread):
             if part != '':
                 return '/' + str(part)
 
-    def parse_datetime(self, string_datetime: str) -> datetime:
+    def parse_datetime(self, string_datetime):
         datetime_result = datetime.strptime(string_datetime[0:20], '%d/%b/%Y:%X')
 
         # The string date has the following format 01/Jul/1995:00:00:09 -400 so so the basic date is 20 characters long
@@ -98,10 +101,10 @@ class Reader(ContinuousThread):
         if string_datetime[21] == '+':
 
             # The we just take the value of the timezone, that we divide by one hundred
-            datetime_result += timedelta(hours=int(string_datetime[22:26]) / 100)
+            datetime_result -= timedelta(hours=int(string_datetime[22:26]) / 100)
 
         elif string_datetime[21] == '-':
 
-            datetime_result -= timedelta(hours=int(string_datetime[22:26]) / 100)
+            datetime_result += timedelta(hours=int(string_datetime[22:26]) / 100)
 
         return datetime_result

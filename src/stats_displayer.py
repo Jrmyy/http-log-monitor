@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 
-from time import strftime, sleep
 import sys
 from queue import Queue, Empty
-from src.lib.core.custom_thread import ContinuousThread
+from time import strftime, sleep
+
+from src.custom_thread import ContinuousThread
 
 
-class Displayer(ContinuousThread):
+class StatisticalDisplayer(ContinuousThread):
 
-    def __init__(self, queue: Queue, interval=10):
+    def __init__(self, read_line_queue: Queue, interval=10):
         super().__init__()
         self.sleep_time = interval
-        self.queue = queue
+        self.read_line_queue = read_line_queue
 
     def run(self):
         while self.can_run:
@@ -33,8 +34,8 @@ class Displayer(ContinuousThread):
 
     def find_top_section(self):
         sections = {}
-        while not self.queue.empty():
-            parsed_line = self.queue.get()
+        while not self.read_line_queue.empty():
+            parsed_line = self.read_line_queue.get()
             section = parsed_line['section']
             if section not in sections.keys():
                 sections[section] = 1
