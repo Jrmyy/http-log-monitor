@@ -47,7 +47,7 @@ class LogSimulator(ContinuousThread):
                + '[' + self.generate_datetime() + ']' + ' ' \
                + '"' + self.generate_request_type() + ' ' \
                + self.generate_request_target() + ' ' \
-               + 'HTTP/1.0"' + ' ' \
+               + 'HTTP/1.1"' + ' ' \
                + self.generate_response_status() + ' ' \
                + self.generate_response_bytes() + '\n'
 
