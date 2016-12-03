@@ -13,20 +13,20 @@ from src.exceptions import LineFormatError
 
 class Reader(ContinuousThread):
     """
-       This thread is going to read each line of the access-log file, format the line into a dictionary and put the
-       parsed line in a queue, shared with the displayer. It also put the date of each line in a second queue, shared
-       with the alert system to keep track of traffic in the last alert_interval time (default is 2 minutes)
+    This thread is going to read each line of the access-log file, format the line into a dictionary and put the
+    parsed line in a queue, shared with the displayer. It also put the date of each line in a second queue, shared
+    with the alert system to keep track of traffic in the last alert_interval time (default is 2 minutes)
 
-        Attributes
-        ----------
-        log_path: str
-            path to the log file that will be read
-        input_queue: Queue
-            This queue is shared with the displayer and contains each line parsed into a dictionary
-        input_traffic_queue: Queue
-            This list contains only the date of each read line. It is shared with the alert system to count the number
-            of requests of the last 2 minutes
-        """
+    Attributes
+    ----------
+    log_path: str
+        path to the log file that will be read
+    input_queue: Queue
+        This queue is shared with the displayer and contains each line parsed into a dictionary
+    input_traffic_queue: Queue
+        This list contains only the date of each read line. It is shared with the alert system to count the number
+        of requests of the last 2 minutes
+    """
 
     def __init__(self, log_path, read_line_queue, traffic_queue):
         super().__init__()

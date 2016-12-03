@@ -6,15 +6,37 @@ from threading import Lock
 from src.alert_system import AlertSystem
 from src.custom_thread import ContinuousThread
 from shutil import get_terminal_size
+from queue import Queue
 
 
 class Displayer(ContinuousThread):
 
+    """
+    This thread aims to display the stats and the alert. It will display the stats each display interval and display
+    alert message when it has to
+
+    Attributes
+    ----------
+    output_queue: Queue
+        This queue is shared with the reader and contains all the read and parsed line of the log file in order to make
+        the statistics
+    alert_content: dict
+        This dict contains all the necessary information in order to display the right alert message
+    display_interval: int
+        In seconds, it is the time between two prints of the statistics concerning the traffic
+    console_lock: Lock
+        This lock enables to print safely
+    terminal_size: int
+        Int to represent to size of the terminal in order to print center messages
+    """
+
+    # Style and weight ids
     BOLD_WEIGHT = 'bold'
     NONE_STYLE = 'none'
     ALERT_STYLE = 'alert'
     OK_STYLE = 'ok'
 
+    # Style and weight tag to be put in string
     BOLD_TAG = '\033[1m'
     NONE_TAG = ''
     ALERT_TAG = '\033[91m'
@@ -30,6 +52,11 @@ class Displayer(ContinuousThread):
         self.terminal_size = get_terminal_size().columns
 
     def run(self):
+        """
+        We are going to print the welcome message and then print the stats each display_interval seconds and print the
+        alert messages when we need to
+        :return:
+        """
 
         starting_message = '* Welcome to the HTTP Log monitoring system *'
         starting_message = '*' * len(starting_message) + '\n' + starting_message + '\n' + '*' * len(starting_message) \
@@ -72,6 +99,10 @@ class Displayer(ContinuousThread):
                 self.alert_content['to_display'] = False
 
     def find_top_section(self):
+        """
+        Find the top section and return the informations to be displayed each display_interval
+        :return display_informations:
+        """
         sections = {}
         while not self.output_queue.empty():
             parsed_line = self.output_queue.get()
@@ -100,7 +131,13 @@ class Displayer(ContinuousThread):
         return display_information
 
     def lock_print(self, string, style=NONE_STYLE, weight=NONE_STYLE):
-        """Thread-safely print function"""
+        """
+        Thread-safe printing function with a certain style and a certain weight
+        :param string:
+        :param style:
+        :param weight:
+        :return:
+        """
         with self.console_lock:
             print(
                 getattr(self, weight.upper() + '_TAG') +
@@ -111,6 +148,12 @@ class Displayer(ContinuousThread):
             )
 
     def print_center(self, string, style=NONE_STYLE, weight=NONE_STYLE):
-        """ Print at the center of the terminal"""
+        """
+        Print at the center of the terminal
+        :param string:
+        :param style:
+        :param weight:
+        :return:
+        """
         for line in string.split('\n'):
             self.lock_print(line.center(self.terminal_size), style, weight)
