@@ -11,37 +11,35 @@ from src.custom_thread import ContinuousThread
 
 class LogSimulator(ContinuousThread):
 
-    def __init__(self, file_to_write: str, requests_per_second: int):
+    def __init__(self, file_to_write):
         super().__init__()
         self.file_to_write = file_to_write
         self.requests = ['GET', 'PUT', 'POST', 'HEAD', 'OPTIONS']
         self.hostname = 'localhost'
         self.sections = ['/', '/section1', '/section2', '/section3']
-        self.requests_per_second = requests_per_second
 
     def run(self):
-        if self.requests_per_second != 0:
+        try:
+            log_file = open(self.file_to_write, 'w')
+        except IOError:
+            print('Unable to open the file for writing')
+            sys.exit()
+
+        while self.can_run:
+            lines_in_batch = 0
             try:
-                log_file = open(self.file_to_write, 'w')
-            except IOError:
-                print('Unable to open the file for writting')
+                log_file.write(self.generate_log_line())
+                lines_in_batch += 1
+                if lines_in_batch % 100 == 0:
+                    log_file.flush()
+            except BaseException:
                 sys.exit()
 
-            while self.can_run:
-                lines_in_batch = 0
-                try:
-                    log_file.write(self.generate_log_line())
-                    lines_in_batch += 1
-                    if lines_in_batch % 100 == 0:
-                        log_file.flush()
-                except BaseException:
-                    sys.exit()
+            log_file.flush()
 
-                log_file.flush()
+        log_file.close()
 
-            log_file.close()
-
-    def generate_log_line(self) -> str:
+    def generate_log_line(self):
         return self.is_a_comment_line() \
                + self.hostname + ' ' \
                + self.generate_word(6) + ' ' \
@@ -59,13 +57,13 @@ class LogSimulator(ContinuousThread):
             return '#'
         return ''
 
-    def generate_word(self, length: int) -> str:
+    def generate_word(self, length):
         return ''.join(choice(ascii_lowercase) for i in range(length))
 
-    def generate_request_type(self) -> str:
+    def generate_request_type(self):
         return choice(self.requests)
 
-    def generate_response_status(self) -> str:
+    def generate_response_status(self):
         random = uniform(0, 1)
         if random < 0.1:
             return '400'
@@ -75,16 +73,16 @@ class LogSimulator(ContinuousThread):
 
         return '200'
 
-    def generate_response_bytes(self) -> str:
+    def generate_response_bytes(self):
         return str(randint(100, 10000))
 
-    def generate_request_target(self) -> str:
+    def generate_request_target(self):
         section = choice(self.sections)
         if section != '/':
             section += self.generate_sub_section()
         return section
 
-    def generate_sub_section(self) -> str:
+    def generate_sub_section(self):
         depth = randint(0, 4)
 
         if depth == 0:
@@ -97,8 +95,8 @@ class LogSimulator(ContinuousThread):
         sub_domain += self.generate_extension()
         return sub_domain
 
-    def generate_extension(self) -> str:
+    def generate_extension(self):
         return choice(['.php', '.html', ''])
 
-    def generate_datetime(self) -> str:
+    def generate_datetime(self):
         return datetime.now().strftime('%d/%b/%Y:%X') + ' ' + strftime("%z", gmtime())

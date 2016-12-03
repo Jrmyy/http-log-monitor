@@ -12,11 +12,11 @@ from src.exceptions import LineFormatError
 
 class Reader(ContinuousThread):
 
-    def __init__(self, log_path, read_line_queue, total_traffic_hits_queue):
+    def __init__(self, log_path, read_line_queue, traffic_queue):
         super().__init__()
         self.log_path = log_path
-        self.read_line_queue = read_line_queue
-        self.total_traffic_hits_queue = total_traffic_hits_queue
+        self.input_queue = read_line_queue
+        self.input_traffic_queue = traffic_queue
 
     def run(self):
         # We are trying to open the file and to go the new added lines
@@ -38,8 +38,8 @@ class Reader(ContinuousThread):
                 else:
                     try:
                         parsed_line = self.parse_log_line(log_line)
-                        self.read_line_queue.put(parsed_line)
-                        self.total_traffic_hits_queue.put(parsed_line['datetime'])
+                        self.input_queue.put(parsed_line)
+                        self.input_traffic_queue.put(parsed_line['datetime'])
                     except LineFormatError:
                         sys.exit()
 
