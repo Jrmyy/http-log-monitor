@@ -1,6 +1,6 @@
 from configparser import ConfigParser
 from queue import Queue
-from src.displayer import StatisticalDisplayer
+from src.displayer import Displayer
 from src.reader import Reader
 from src.alert_system import AlertSystem
 from src.log_simulator import LogSimulator

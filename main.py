@@ -15,11 +15,11 @@ if __name__ == '__main__':
     total_traffic_hits_queue = Queue()
     alert_content = {'type' : AlertSystem.ALERT_RECOVER_TYPE, 'to_display': False, 'time': datetime.now()}
 
-    # reader = Reader('/Applications/AMPPS/apache/logs/access_log', read_line_queue, total_traffic_hits_queue)
+    #reader = Reader('/Applications/AMPPS/apache/logs/access_log', read_line_queue, total_traffic_hits_queue)
     reader = Reader(DIR_NAME + '/data/access-log.log', read_line_queue, total_traffic_hits_queue)
     displayer = Displayer(read_line_queue, alert_content)
     log_simulator = LogSimulator(DIR_NAME + '/data/access-log.log')
-    alert = AlertSystem(100, total_traffic_hits_queue, alert_content)
+    alert = AlertSystem(10, total_traffic_hits_queue, alert_content)
 
     displayer.start()
     log_simulator.start()

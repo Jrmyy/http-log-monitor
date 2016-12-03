@@ -25,6 +25,7 @@ class ContinuousThread(Thread):
         self.can_run = True
 
     def resume(self):
+        """Function to keep the thread running indefinitely"""
         with self.state:
             self.paused = False
             self.state.notify()

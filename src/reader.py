@@ -5,12 +5,28 @@ import sys
 from datetime import datetime, timedelta
 from os import SEEK_END
 from time import sleep
+from queue import Queue
 
 from src.custom_thread import ContinuousThread
 from src.exceptions import LineFormatError
 
 
 class Reader(ContinuousThread):
+    """
+       This thread is going to read each line of the access-log file, format the line into a dictionary and put the
+       parsed line in a queue, shared with the displayer. It also put the date of each line in a second queue, shared
+       with the alert system to keep track of traffic in the last alert_interval time (default is 2 minutes)
+
+        Attributes
+        ----------
+        log_path: str
+            path to the log file that will be read
+        input_queue: Queue
+            This queue is shared with the displayer and contains each line parsed into a dictionary
+        input_traffic_queue: Queue
+            This list contains only the date of each read line. It is shared with the alert system to count the number
+            of requests of the last 2 minutes
+        """
 
     def __init__(self, log_path, read_line_queue, traffic_queue):
         super().__init__()
@@ -19,6 +35,14 @@ class Reader(ContinuousThread):
         self.input_traffic_queue = traffic_queue
 
     def run(self):
+        """
+        First we are going to open the log file to read, throw an exception if we can't
+        While the thread can run:
+         - We go at the end of the file and we assume that there are lines after
+         - We read each line and we repeat the process
+         - Each read line is put in the input_queue and the date is put in the input_traffic_queue
+        """
+
         # We are trying to open the file and to go the new added lines
         try:
             log_file = open(self.log_path)
@@ -44,6 +68,11 @@ class Reader(ContinuousThread):
                         sys.exit()
 
     def parse_log_line(self, line):
+        """
+        We parse the line with several regex
+        :param line:
+        :return dict:
+        """
         # We create the pattern and we inject the variable we want for the different parts
         pattern = re.compile(
             r'^(?P<remote_host>\S*) (?P<user_identity>\S*) (?P<user_name>\S*) \[(?P<datetime>.*?)\]'
@@ -77,6 +106,12 @@ class Reader(ContinuousThread):
         return formatted_line
 
     def get_section(self, request):
+        """
+        We get the section of each requested url
+        For instance, the section of "/test/foo/bar" will be "/test"
+        :param request:
+        :return str:
+        """
         section = re.match(r'^\S+ (/\S*) \S+', request.strip())
 
         # If the section doesn't match with the regex, we raise a LineFormatError
@@ -94,9 +129,14 @@ class Reader(ContinuousThread):
                 return '/' + str(part)
 
     def parse_datetime(self, string_datetime):
+        """
+        We transform the string datetime in a python datetime object (we pay attention to the timezone offset)
+        :param string_datetime:
+        :return datetime:
+        """
         datetime_result = datetime.strptime(string_datetime[0:20], '%d/%b/%Y:%X')
 
-        # The string date has the following format 01/Jul/1995:00:00:09 -400 so so the basic date is 20 characters long
+        # The string date has the following format 01/Jul/1995:00:00:09 -0400 so so the basic date is 20 characters long
         # and the timezone is the 22th character, so at index 21
         if string_datetime[21] == '+':
 
