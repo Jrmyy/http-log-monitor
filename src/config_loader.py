@@ -1,13 +1,7 @@
 from configparser import ConfigParser
-from queue import Queue
-from src.displayer import Displayer
-from src.reader import Reader
-from src.alert_system import AlertSystem
-from src.log_simulator import LogSimulator
 from src.exceptions import ConfigError
 from voluptuous import Required, All, Length, Range, Schema, MultipleInvalid
 from distutils.util import strtobool
-import sys
 
 
 class ConfigLoader(ConfigParser):
@@ -49,7 +43,8 @@ class ConfigLoader(ConfigParser):
 
         parameters = {}
 
-        # We put each thread in a dictionary by calling the according providing method of each thread
+        # We put the required parameters for each thread in a dictionary by calling the relevant
+        # provide method of each thread
         for section in self.sections():
             lower_section = section.lower()
             parameters[lower_section] = getattr(

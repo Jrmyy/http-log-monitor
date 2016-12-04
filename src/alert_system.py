@@ -5,7 +5,7 @@ from src.custom_thread import ContinuousThread
 
 class AlertSystem(ContinuousThread):
     """
-    This class has to calculate whether or not to display an alert raising or recovering message. In order to do
+    This class has to calculate whether or not to display an alert raised or recovered message. In order to do
     that, the AlertSystem thread has to calculate if the total_traffic on the past 2 minutes, divided by the alert
     interval is higher or lower than the threshold, defined by the maximum allowed requests per second
 
@@ -21,7 +21,7 @@ class AlertSystem(ContinuousThread):
         alert_interval
     alert_content: dict
         This dictionary is shared with the alert displayer and contains all the information that will be displayed in
-        case of an alert (raising or recovering)
+        case of an alert (raised or recovered)
     alert_interval: int
         The interval (in seconds) of calculation (default is 2 minutes, 120 seconds)
     """
@@ -39,9 +39,9 @@ class AlertSystem(ContinuousThread):
 
     def run(self):
         """
-        While the thread can run it:
+        As long as the thread is still running:
             - refreshes the list by keeping the elements that are still in the alert_interval
-            - calculates if an alert raising or recovering must be displayed
+            - calculates if an alert raised or recovered message must be displayed
             - Get the elements from the reader in the output_traffic_queue and put it in the traffic_hits_list and then
             refreshed the list
         """
@@ -76,7 +76,7 @@ class AlertSystem(ContinuousThread):
 
     def prepare_alert_raise_message(self):
         """
-        Populate the alert_content with the alert raising message elements
+        Populate the alert_content with the raised alert message elements
         """
         self.alert_content['hits'] = len(self.traffic_hits_list)
         self.alert_content['type'] = AlertSystem.ALERT_RAISE_TYPE
@@ -84,7 +84,7 @@ class AlertSystem(ContinuousThread):
 
     def prepare_alert_recover_message(self):
         """
-        Populate the alert_content with the alert recovering message elements
+        Populate the alert_content with the recovered alert message elements
         """
         self.alert_content['type'] = AlertSystem.ALERT_RECOVER_TYPE
         self.prepare_message()
@@ -99,8 +99,8 @@ class AlertSystem(ContinuousThread):
 
     def refresh_requests_list(self):
         """
-        Refresh the traffic_hits_list by keeping only the elements that are closer enough of the current time. The
-        elements are sorted by ascending time so we go in the list and if we met an element that is close of the current
+        Refresh the traffic_hits_list by keeping only the elements that are close enough of the current time. The
+        elements are sorted by ascending time so we go in the list and if we meet an element that is close to the current
         time, we don't need to go further in the list and we stop the algorithm
         """
         current_time = datetime.utcnow()

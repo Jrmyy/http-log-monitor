@@ -19,11 +19,13 @@ The project follows this concept:
 
 -   First, a ConfigLoader will create the class parameters for each thread by reading the config file
 -   A Reader that reads each line of the log file, parses the lines and creates a dictionary thanks to the data extracted from the line, and then puts the data in a queue shared with a Displayer in order to print the stats. The Reader also shares a queue with the AlertSystem, containing the datetime of each line of the log file
--   A Displayer that displays the statistics each 10 seconds, by reading the queue shared with the reader and print the alert raising and recovering messages by getting the informations from a dictionary shared with the AlertSystem
+-   A Displayer that displays the statistics each 10 seconds, by reading the queue shared with the reader and print the alert raised and recovered messages by getting the informations from a dictionary shared with the AlertSystem
 -   An AlertSystem that checks if an alert message should be raised by getting the elements from the queue shared with the Reader, and keeping only the elements that are separated from the current time by a maximum of 2 minutes.
 -   An optional LogSimulator, that writes W3C-formatted lines in a log file
 
 Each process is running in a different thread to enable to in the log file, to read the same log file, to display the stats and the alert messages, and to check if an alert message should be raised.
+
+The program is composed of three threads: the reader, the displayer and the alert system, and a extra optional thread with the log simulator. The advantage of this structure is that each element is independent from the others. If we want to change our reader, it will be easy. Moreover, we can add many readers to put the lines in the same queue. We can apply the same logic to the displayer and the alert system.
 
 How to use it ?
 ---------------
