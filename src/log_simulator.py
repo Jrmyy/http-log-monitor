@@ -25,12 +25,12 @@ class LogSimulator(ContinuousThread):
         The different sections of the website
     """
 
-    def __init__(self, file_to_write, hostname):
+    def __init__(self, file_to_write, hostname, sections):
         super().__init__()
         self.file_to_write = file_to_write
         self.requests = ['GET', 'PUT', 'POST', 'HEAD', 'OPTIONS']
         self.hostname = hostname
-        self.sections = ['/', '/section1', '/section2', '/section3']
+        self.sections = sections
 
     def run(self):
         """
@@ -49,7 +49,7 @@ class LogSimulator(ContinuousThread):
             try:
                 log_file.write(self.generate_log_line())
                 lines_in_batch += 1
-                if lines_in_batch % 100 == 0:
+                if lines_in_batch % 10 == 0:
                     log_file.flush()
             except BaseException:
                 sys.exit()

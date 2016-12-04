@@ -29,3 +29,7 @@ class ContinuousThread(Thread):
         with self.state:
             self.paused = False
             self.state.notify()
+
+    def stop(self):
+        self.alive = False
+        self.can_run = False

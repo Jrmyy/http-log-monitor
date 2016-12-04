@@ -50,6 +50,7 @@ class Displayer(ContinuousThread):
         self.display_interval = display_interval
         self.console_lock = Lock()
         self.terminal_size = get_terminal_size().columns
+        self.queue_lock = Lock()
 
     def run(self):
         """
@@ -100,10 +101,11 @@ class Displayer(ContinuousThread):
 
     def find_top_section(self):
         """
-        Find the top section and return the informations to be displayed each display_interval
-        :return display_informations:
+        Find the top section and return the information to be displayed each display_interval
+        :return display_information:
         """
         sections = {}
+
         while not self.output_queue.empty():
             parsed_line = self.output_queue.get()
             section = parsed_line['section']

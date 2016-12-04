@@ -20,7 +20,6 @@ class ConfigLoader(ConfigParser):
         Required('file_to_write'): All(str, Length(min=1)),
         Required('hostname'): All(str, Length(min=1)),
         Required('sections'): All(list, Length(min=1)),
-        Required('enabled'): All(bool)
     })
 
     READER_SCHEMA = Schema({
@@ -103,10 +102,12 @@ class ConfigLoader(ConfigParser):
         if not class_parameters['enabled']:
             return None
 
+        del class_parameters['enabled']
+
         website_sections = ['/']
         if class_parameters['number_of_sections'] > 1:
             for i in range(1, class_parameters['number_of_sections']):
-                website_sections.append('/section' + i)
+                website_sections.append('/section' + str(i))
 
         class_parameters['sections'] = website_sections
         del class_parameters['number_of_sections']

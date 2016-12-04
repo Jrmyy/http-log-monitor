@@ -58,7 +58,6 @@ class Reader(ContinuousThread):
                 log_line = log_file.readline()
                 if not log_line:
                     end_of_file = True
-                    sleep(0.1)
                 else:
                     try:
                         parsed_line = self.parse_log_line(log_line)
