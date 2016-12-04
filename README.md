@@ -28,7 +28,7 @@ Each process is running in a different thread to enable to in the log file, to r
 How to use it ?
 ---------------
 
-This program is using Python 3.5. First, you will need to install the requiring packages, by running the Makefile.
+This program is using Python 3.5. First, you will need to install the required packages, by running the Makefile.
 
 ### Using the simulation
 
