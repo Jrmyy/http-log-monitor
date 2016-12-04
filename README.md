@@ -1,5 +1,5 @@
-HTTP Log monitoring system
-==========================
+<center>HTTP Log monitoring system
+==========================</center>
 
 Subject
 -------
