@@ -28,6 +28,8 @@ Each process is running in a different thread to enable to in the log file, to r
 How to use it ?
 ---------------
 
+First, you will need to install the requiring packages, by running the Makefile.
+
 ### Using the simulation
 
 In order to see the algorithm works, you just need to go in the project folder, and launch the short\_simulation file. This sample is running during 3 minutes with a Reader, a Displayer, an AlertSystem and a LogSimulator. During two minutes, the LogSimulator is running to enable the raising of an alert by putting a lower threshold than the real number of requests per second. Then, for the last minute, we just stop the LogSimulator to enable the number of requests per second to drop below the threshold and to display an alert recovery message.
