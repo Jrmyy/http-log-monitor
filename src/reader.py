@@ -95,6 +95,7 @@ class Reader(ContinuousThread):
         except ValueError:
             raise LineFormatError("The status code or the response size aren't integers")
 
+        formatted_line['section'] = self.get_section(formatted_line['request'])
         # Now we are going to format the date in the native datetime format
         try:
             formatted_line['datetime'] = self.parse_datetime(formatted_line['datetime'])
