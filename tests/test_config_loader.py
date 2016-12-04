@@ -15,7 +15,8 @@ class MyTestCase(unittest.TestCase):
                 'log_path': '/path/to/test'
             },
             'displayer': {
-                'display_interval': 99
+                'display_interval': 99,
+                'activate_color': True
             },
             'alert_system': {
                 'max_requests_per_second': 14,
@@ -36,7 +37,8 @@ class MyTestCase(unittest.TestCase):
                 'log_path': '/path/to/test'
             },
             'displayer': {
-                'display_interval': 99
+                'display_interval': 99,
+                'activate_color': True
             },
             'alert_system': {
                 'max_requests_per_second': 14,

@@ -17,7 +17,7 @@ if __name__ == '__main__':
     alert_content = {'type': AlertSystem.ALERT_RECOVER_TYPE, 'to_display': False}
 
     reader = Reader(DIR_NAME + '/data/access-log.log', read_line_queue, traffic_queue)
-    displayer = Displayer(read_line_queue, alert_content, 10)
+    displayer = Displayer(read_line_queue, alert_content, 10, True)
     alert_system = AlertSystem(80, traffic_queue, alert_content, 120)
     log_simulator = LogSimulator(DIR_NAME + '/data/access-log.log', 'localhost', ['/', '/section1'])
 

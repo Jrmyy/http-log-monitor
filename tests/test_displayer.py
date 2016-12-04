@@ -6,7 +6,7 @@ from src.displayer import Displayer
 
 class TestDisplayer(unittest.TestCase):
 
-    displayer = Displayer(Queue(), {}, 1)
+    displayer = Displayer(Queue(), {}, 1, True)
 
     def test_find_top_section(self):
 

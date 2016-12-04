@@ -28,6 +28,8 @@ class Displayer(ContinuousThread):
         This lock enables to print safely
     terminal_size: int
         Int to represent to size of the terminal in order to print center messages
+    activate_color: bool
+        Decide or not to use colors (Windows computers can't see the colors)
     """
 
     # Style and weight ids
@@ -43,13 +45,14 @@ class Displayer(ContinuousThread):
     OK_TAG = '\033[92m'
     END_TAG = '\033[0m'
 
-    def __init__(self, output_queue, alert_content, display_interval):
+    def __init__(self, output_queue, alert_content, display_interval, activate_color):
         super().__init__()
         self.output_queue = output_queue
         self.alert_content = alert_content
         self.display_interval = display_interval
         self.console_lock = Lock()
         self.terminal_size = get_terminal_size().columns
+        self.activate_color = activate_color
 
     def run(self):
         """
@@ -140,13 +143,16 @@ class Displayer(ContinuousThread):
         :return:
         """
         with self.console_lock:
-            print(
-                getattr(self, weight.upper() + '_TAG') +
-                getattr(self, style.upper() + '_TAG') +
-                string +
-                Displayer.END_TAG +
-                Displayer.END_TAG
-            )
+            if not self.activate_color:
+                print(string)
+            else:
+                print(
+                    getattr(self, weight.upper() + '_TAG') +
+                    getattr(self, style.upper() + '_TAG') +
+                    string +
+                    Displayer.END_TAG +
+                    Displayer.END_TAG
+                )
 
     def print_center(self, string, style=NONE_STYLE, weight=NONE_STYLE):
         """

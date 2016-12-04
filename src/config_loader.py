@@ -28,6 +28,7 @@ class ConfigLoader(ConfigParser):
 
     DISPLAYER_SCHEMA = Schema({
         Required('display_interval'): All(int, Range(min=1)),
+        Required('activate_color'): All(bool),
     })
 
     ALERT_SYSTEM_SCHEMA = Schema({
@@ -88,8 +89,9 @@ class ConfigLoader(ConfigParser):
     def provide_displayer_class_parameters(self, class_parameters):
         try:
             class_parameters['display_interval'] = int(class_parameters['display_interval'])
+            class_parameters['activate_color'] = bool(strtobool(class_parameters['activate_color']))
         except (KeyError, ValueError):
-            raise ConfigError('The display interval of the Displayer must be integer')
+            raise ConfigError('One of the parameter of the Displayer doesn\'t match with the required type')
 
         self.validate_section('displayer', class_parameters)
         return class_parameters

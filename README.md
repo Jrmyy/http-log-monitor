@@ -48,6 +48,6 @@ Improvements
 ------------
 
 To me, the system can be improved with several things I didn't have time to make
--   For now, it is a console program, but we can think at the Logger, to log when we display stuff
+-   For now, it is a console program, but we can think at the Logger, to write in a file every line printed in the console, to have a diary of the program
 -   We can add a database, to handle easier the calculation of the total traffic in the last 2 minutes, and also the statistics on the website
 -   Make the service runnable from everywhere and not be forced to go on the project and start the main file
