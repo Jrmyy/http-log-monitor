@@ -22,6 +22,7 @@ Project structure
 
 The project follows this concept:
 
+-  First, a ConfigLoader will create the different threads by reading the config file
 -  A Reader that reads each line of the log file, parses the lines and
    creates a dictionary thanks to the data extracted from the line, and
    then puts the data in a queue shared with a Displayer in order to
