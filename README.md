@@ -34,4 +34,12 @@ In order to see the algorithm works, you just need to go in the project folder, 
 
 ### Using on your own system
 
-To perform the monitoring of your own system, you will have to use the main file. But you can custom the system with the config.ini file
+To perform the monitoring of your own system, you will have to use the main file. But you can custom the system with the config.ini file. You can change
+-   Simulator: the file in which you want to write the log lines, the hostname, the number of sections on your website and if the Simulator has to be used or not
+-   Displayer: you can change the display interval (in the subject, it was 10 seconds)
+-   Reader: the path to access the log file
+-   AlertSystem: the threshold (maximum number of requests per second), the alert interval (in the subject, it was 2 minutes)
+
+And then, after choosing your own parameters, you just need to launch the main file and to let the algorithm makes its work
+
+## Improvements
