@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import os
+import sys
 from src.config_loader import ConfigLoader
 from queue import Queue
 from src.log_simulator import LogSimulator
@@ -12,38 +13,43 @@ DIR_NAME = os.path.dirname(os.path.abspath(__file__))
 
 if __name__ == '__main__':
 
-    config = ConfigLoader(DIR_NAME + '/config.ini')
-    parameters = config.configure_threads()
+    try:
 
-    read_line_queue = Queue()
-    traffic_queue = Queue()
-    alert_content = {'type': AlertSystem.ALERT_RECOVER_TYPE, 'to_display': False}
+        config = ConfigLoader(DIR_NAME + '/config.ini')
+        parameters = config.configure_threads()
 
-    reader = Reader(input_queue=read_line_queue, input_traffic_queue=traffic_queue, **parameters['reader'])
-    displayer = Displayer(output_queue=read_line_queue, alert_content= alert_content, **parameters['displayer'])
-    alert_system = AlertSystem(
-        output_traffic_queue=traffic_queue,
-        alert_content=alert_content,
-        **parameters['alert_system']
-    )
+        read_line_queue = Queue()
+        traffic_queue = Queue()
+        alert_content = {'type': AlertSystem.ALERT_RECOVER_TYPE, 'to_display': False}
 
-    has_simulator = False
-    log_simulator = None
+        reader = Reader(input_queue=read_line_queue, input_traffic_queue=traffic_queue, **parameters['reader'])
+        displayer = Displayer(output_queue=read_line_queue, alert_content= alert_content, **parameters['displayer'])
+        alert_system = AlertSystem(
+            output_traffic_queue=traffic_queue,
+            alert_content=alert_content,
+            **parameters['alert_system']
+        )
 
-    if 'log_simulator' in parameters.keys() and parameters['log_simulator'] is not None:
-        log_simulator = LogSimulator(**parameters['log_simulator'])
-        has_simulator = True
+        has_simulator = False
+        log_simulator = None
 
-    displayer.start()
-    reader.start()
-    alert_system.start()
+        if 'log_simulator' in parameters.keys() and parameters['log_simulator'] is not None:
+            log_simulator = LogSimulator(**parameters['log_simulator'])
+            has_simulator = True
 
-    if has_simulator:
-        log_simulator.start()
+        displayer.start()
+        reader.start()
+        alert_system.start()
 
-    while True:
-        displayer.resume()
-        reader.resume()
-        alert_system.resume()
         if has_simulator:
-            log_simulator.resume()
+            log_simulator.start()
+
+        while True:
+            displayer.resume()
+            reader.resume()
+            alert_system.resume()
+            if has_simulator:
+                log_simulator.resume()
+    except KeyboardInterrupt:
+        print('Shutting down the service ...')
+        sys.exit(0)

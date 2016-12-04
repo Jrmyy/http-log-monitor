@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import re
-import sys
 from datetime import datetime, timedelta
 from os import SEEK_END
 from _thread import interrupt_main
@@ -47,7 +46,7 @@ class Reader(ContinuousThread):
         try:
             log_file = open(self.log_path)
         except IOError:
-            print('Unable to open the file')
+            print('Unable to open the file for reading')
             interrupt_main()
 
         # We go at the end of the file

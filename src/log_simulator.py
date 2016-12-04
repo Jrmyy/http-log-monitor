@@ -43,7 +43,7 @@ class LogSimulator(ContinuousThread):
             log_file = open(self.file_to_write, 'w')
         except IOError:
             print('Unable to open the file for writing')
-            sys.exit()
+            interrupt_main()
 
         while self.can_run:
             lines_in_batch = 0
