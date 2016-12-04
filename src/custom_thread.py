@@ -10,12 +10,9 @@ class ContinuousThread(Thread):
     daemon: bool
         Decides if the thread has be to run as daemon
     paused: bool
-
-
-        alert_interval
-    traffic_hits_list: list
-        This list contains the date in the queue. We use this list in order to keep track of the lines read in the last
-        alert_interval
+        True if the thread is paused
+    state: Condition
+    can_run: bool
     """
     def __init__(self):
         super().__init__()
@@ -25,11 +22,16 @@ class ContinuousThread(Thread):
         self.can_run = True
 
     def resume(self):
-        """Function to keep the thread running indefinitely"""
+        """
+        Function to keep the thread running indefinitely
+        """
         with self.state:
             self.paused = False
             self.state.notify()
 
     def stop(self):
+        """
+        Stop a thread
+        """
         self.alive = False
         self.can_run = False
