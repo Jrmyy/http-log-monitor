@@ -25,7 +25,7 @@ class LogSimulator(ContinuousThread):
         The different sections of the website
     """
 
-    def __init__(self, file_to_write, hostname = 'localhost'):
+    def __init__(self, file_to_write, hostname):
         super().__init__()
         self.file_to_write = file_to_write
         self.requests = ['GET', 'PUT', 'POST', 'HEAD', 'OPTIONS']

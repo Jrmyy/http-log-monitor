@@ -29,10 +29,10 @@ class AlertSystem(ContinuousThread):
     ALERT_RAISE_TYPE = 'alert_raise'
     ALERT_RECOVER_TYPE = 'alert_recover'
 
-    def __init__(self, threshold, traffic_queue, alert_content, alert_interval=120):
+    def __init__(self, max_requests_per_second, output_traffic_queue, alert_content, alert_interval):
         super().__init__()
-        self.max_requests_per_second = threshold
-        self.output_traffic_queue = traffic_queue
+        self.max_requests_per_second = max_requests_per_second
+        self.output_traffic_queue = output_traffic_queue
         self.traffic_hits_list = []
         self.alert_content = alert_content
         self.alert_interval = alert_interval

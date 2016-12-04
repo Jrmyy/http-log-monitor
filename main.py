@@ -1,35 +1,36 @@
 #!/usr/bin/python
 
 import os
-from queue import Queue
-from datetime import datetime
-from src.log_simulator import LogSimulator
-from src.reader import Reader
-from src.displayer import Displayer
-from src.alert_system import AlertSystem
+from src.config_loader import ConfigLoader
 
 DIR_NAME = os.path.dirname(os.path.abspath(__file__))
 
 if __name__ == '__main__':
-    read_line_queue = Queue()
-    total_traffic_hits_queue = Queue()
-    alert_content = {'type' : AlertSystem.ALERT_RECOVER_TYPE, 'to_display': False, 'time': datetime.now()}
 
-    #reader = Reader('/Applications/AMPPS/apache/logs/access_log', read_line_queue, total_traffic_hits_queue)
-    reader = Reader(DIR_NAME + '/data/access-log.log', read_line_queue, total_traffic_hits_queue)
-    displayer = Displayer(read_line_queue, alert_content)
-    log_simulator = LogSimulator(DIR_NAME + '/data/access-log.log')
-    alert = AlertSystem(10, total_traffic_hits_queue, alert_content)
+    config = ConfigLoader(DIR_NAME + '/config.ini')
+    threads = config.configure_threads()
+
+    displayer = threads['displayer']
+    reader = threads['reader']
+    alert_system = threads['alert_system']
+
+    has_simulator = False
+    log_simulator = None
+
+    if 'log_simulator' in threads.keys() and threads['log_simulator'] is not None:
+        log_simulator = threads['log_simulator']
+        has_simulator = True
 
     displayer.start()
-    log_simulator.start()
     reader.start()
-    alert.start()
+    alert_system.start()
+
+    if has_simulator:
+        log_simulator.start()
 
     while True:
         displayer.resume()
-        log_simulator.resume()
         reader.resume()
-        alert.resume()
-
-
+        alert_system.resume()
+        if has_simulator:
+            log_simulator.resume()

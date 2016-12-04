@@ -43,11 +43,11 @@ class Displayer(ContinuousThread):
     OK_TAG = '\033[92m'
     END_TAG = '\033[0m'
 
-    def __init__(self, output_queue, alert_content, interval=10):
+    def __init__(self, output_queue, alert_content, display_interval):
         super().__init__()
         self.output_queue = output_queue
         self.alert_content = alert_content
-        self.display_interval = interval
+        self.display_interval = display_interval
         self.console_lock = Lock()
         self.terminal_size = get_terminal_size().columns
 

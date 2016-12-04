@@ -28,11 +28,11 @@ class Reader(ContinuousThread):
         of requests of the last 2 minutes
     """
 
-    def __init__(self, log_path, read_line_queue, traffic_queue):
+    def __init__(self, log_path, input_queue, input_traffic_queue):
         super().__init__()
         self.log_path = log_path
-        self.input_queue = read_line_queue
-        self.input_traffic_queue = traffic_queue
+        self.input_queue = input_queue
+        self.input_traffic_queue = input_traffic_queue
 
     def run(self):
         """
