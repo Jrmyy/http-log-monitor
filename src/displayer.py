@@ -50,7 +50,6 @@ class Displayer(ContinuousThread):
         self.display_interval = display_interval
         self.console_lock = Lock()
         self.terminal_size = get_terminal_size().columns
-        self.queue_lock = Lock()
 
     def run(self):
         """
