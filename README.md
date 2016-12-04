@@ -1,6 +1,8 @@
-<center>HTTP Log monitoring system
-==========================</center>
-
+<div align="center">
+HTTP Log monitoring system
+==========================
+</div>
+<div align="justify">
 Subject
 -------
 
@@ -35,3 +37,5 @@ In order to see the algorithm works, you just need to go in the project folder, 
 ### Using on your own system
 
 To perform the monitoring of your own system, you will have to use the main file. But you can custom the system with the config.ini file
+
+</div>
