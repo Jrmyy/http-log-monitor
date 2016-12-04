@@ -42,7 +42,7 @@ To perform the monitoring of your own system, you will have to use the main file
 
 And then, after choosing your own parameters, you just need to launch the main file and to let the algorithm makes its work
 
-How to use it ?
+Improvements ?
 ---------------
 
 To me, the system can be improved with several things I didn't have time to make
