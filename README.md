@@ -44,8 +44,8 @@ To perform the monitoring of your own system, you will have to use the main file
 
 And then, after choosing your own parameters, you just need to launch the main file and to let the algorithm makes its work
 
-Improvements ?
----------------
+Improvements
+------------
 
 To me, the system can be improved with several things I didn't have time to make
 -   For now, it is a console program, but we can think at the Logger, to log when we display stuff
