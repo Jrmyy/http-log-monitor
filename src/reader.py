@@ -4,7 +4,7 @@ import re
 import sys
 from datetime import datetime, timedelta
 from os import SEEK_END
-from time import sleep
+from _thread import interrupt_main
 from queue import Queue
 
 from src.custom_thread import ContinuousThread
@@ -48,7 +48,7 @@ class Reader(ContinuousThread):
             log_file = open(self.log_path)
         except IOError:
             print('Unable to open the file')
-            sys.exit()
+            interrupt_main()
 
         # We go at the end of the file
         log_file.seek(0, SEEK_END)
@@ -64,7 +64,8 @@ class Reader(ContinuousThread):
                         self.input_queue.put(parsed_line)
                         self.input_traffic_queue.put(parsed_line['datetime'])
                     except LineFormatError:
-                        sys.exit()
+                        log_file.close()
+                        interrupt_main()
 
     def parse_log_line(self, line):
         """
@@ -94,8 +95,6 @@ class Reader(ContinuousThread):
             formatted_line['status_code'] = int(formatted_line['status_code'])
         except ValueError:
             raise LineFormatError("The status code or the response size aren't integers")
-
-        formatted_line['section'] = self.get_section(formatted_line['request'])
 
         # Now we are going to format the date in the native datetime format
         try:

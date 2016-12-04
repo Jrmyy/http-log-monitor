@@ -6,6 +6,7 @@ from random import choice, randint, uniform
 from string import ascii_lowercase
 from time import strftime, gmtime
 from src.custom_thread import ContinuousThread
+from _thread import interrupt_main
 
 
 class LogSimulator(ContinuousThread):
@@ -49,10 +50,11 @@ class LogSimulator(ContinuousThread):
             try:
                 log_file.write(self.generate_log_line())
                 lines_in_batch += 1
-                if lines_in_batch % 10 == 0:
+                if lines_in_batch % 100 == 0:
                     log_file.flush()
             except BaseException:
-                sys.exit()
+                log_file.close()
+                interrupt_main()
 
             log_file.flush()
 

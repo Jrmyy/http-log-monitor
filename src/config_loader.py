@@ -24,21 +24,15 @@ class ConfigLoader(ConfigParser):
 
     READER_SCHEMA = Schema({
         Required('log_path'): All(str, Length(min=1)),
-        Required('input_queue'): All(Queue),
-        Required('input_traffic_queue'): All(Queue)
     })
 
     DISPLAYER_SCHEMA = Schema({
         Required('display_interval'): All(int, Range(min=1)),
-        Required('output_queue'): All(Queue),
-        Required('alert_content'): All(dict)
     })
 
     ALERT_SYSTEM_SCHEMA = Schema({
         Required('max_requests_per_second'): All(int, Range(min=1)),
         Required('alert_interval'): All(int, Range(min=1)),
-        Required('output_traffic_queue'): All(Queue),
-        Required('alert_content'): All(dict)
     })
 
     def __init__(self, config_file):
@@ -52,47 +46,19 @@ class ConfigLoader(ConfigParser):
         if sorted(lower_sections) != ConfigLoader.EXPECTED_SECTIONS:
             raise ConfigError('The config format doesn\'t match with the wanted format')
 
-        # Shared python objects
-        #   - the read_line_queue, shared between the reader and the displayer
-        #   - the total_traffic_hits_queue, shared between the alert system and the reader
-        #   - the alert_contenct dictionary, shared between the alert system and the alert displayer
-
-        read_line_queue = Queue()
-        traffic_queue = Queue()
-        alert_content = {'type': AlertSystem.ALERT_RECOVER_TYPE, 'to_display': False}
-
-        # We map the different threads with the shared elements they require
-        shared_parameters = {
-            'log_simulator': {},
-            'reader': {
-                'input_queue': read_line_queue,
-                'input_traffic_queue': traffic_queue
-            },
-            'displayer': {
-                'output_queue': read_line_queue,
-                'alert_content': alert_content
-            },
-            'alert_system': {
-                'output_traffic_queue': traffic_queue,
-                'alert_content': alert_content
-            }
-        }
-
-        threads = {}
+        parameters = {}
 
         # We put each thread in a dictionary by calling the according providing method of each thread
         for section in self.sections():
             lower_section = section.lower()
-            threads[lower_section] = getattr(
+            parameters[lower_section] = getattr(
                 self,
-                'provide_'+lower_section+'_class'
-            )(
-                {**dict(self.items(section)), **shared_parameters[lower_section]}
-            )
+                'provide_'+lower_section+'_class_parameters'
+            )(dict(self.items(section)))
 
-        return threads
+        return parameters
 
-    def provide_log_simulator_class(self, class_parameters):
+    def provide_log_simulator_class_parameters(self, class_parameters):
         try:
             class_parameters['number_of_sections'] = int(class_parameters['number_of_sections'])
             class_parameters['enabled'] = bool(strtobool(class_parameters['enabled']))
@@ -113,22 +79,22 @@ class ConfigLoader(ConfigParser):
         del class_parameters['number_of_sections']
 
         self.validate_section('log_simulator', class_parameters)
-        return LogSimulator(**class_parameters)
+        return class_parameters
 
-    def provide_reader_class(self, class_parameters):
+    def provide_reader_class_parameters(self, class_parameters):
         self.validate_section('reader', class_parameters)
-        return Reader(**class_parameters)
+        return class_parameters
 
-    def provide_displayer_class(self, class_parameters):
+    def provide_displayer_class_parameters(self, class_parameters):
         try:
             class_parameters['display_interval'] = int(class_parameters['display_interval'])
         except (KeyError, ValueError):
             raise ConfigError('The display interval of the Displayer must be integer')
 
         self.validate_section('displayer', class_parameters)
-        return Displayer(**class_parameters)
+        return class_parameters
 
-    def provide_alert_system_class(self, class_parameters):
+    def provide_alert_system_class_parameters(self, class_parameters):
         try:
             class_parameters['max_requests_per_second'] = int(class_parameters['max_requests_per_second'])
             class_parameters['alert_interval'] = int(class_parameters['alert_interval'])
@@ -137,7 +103,7 @@ class ConfigLoader(ConfigParser):
                               'must be integers')
 
         self.validate_section('alert_system', class_parameters)
-        return AlertSystem(**class_parameters)
+        return class_parameters
 
     def validate_section(self, thread_name, class_parameters):
         try:

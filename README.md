@@ -17,7 +17,7 @@ Project structure
 
 The project follows this concept:
 
--   First, a ConfigLoader will create the different threads by reading the config file
+-   First, a ConfigLoader will create the class parameters for each thread by reading the config file
 -   A Reader that reads each line of the log file, parses the lines and creates a dictionary thanks to the data extracted from the line, and then puts the data in a queue shared with a Displayer in order to print the stats. The Reader also shares a queue with the AlertSystem, containing the datetime of each line of the log file
 -   A Displayer that displays the statistics each 10 seconds, by reading the queue shared with the reader and print the alert raising and recovering messages by getting the informations from a dictionary shared with the AlertSystem
 -   An AlertSystem that checks if an alert message should be raised by getting the elements from the queue shared with the Reader, and keeping only the elements that are separated from the current time by a maximum of 2 minutes.
@@ -42,7 +42,7 @@ To perform the monitoring of your own system, you will have to use the main file
 -   Reader: the path to access the log file
 -   AlertSystem: the threshold (maximum number of requests per second), the alert interval (in the subject, it was 2 minutes)
 
-And then, after choosing your own parameters, you just need to launch the main file and to let the algorithm makes its work
+And then, after choosing your own parameters, you just need to launch the main file and to let the algorithm makes its work. The main will instantiate the thread and make them run
 
 Improvements
 ------------
