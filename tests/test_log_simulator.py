@@ -5,7 +5,7 @@ from src.log_simulator import LogSimulator
 
 class TestLogSimulator(unittest.TestCase):
 
-    log_simulator = LogSimulator('unit-test', 'localhost')
+    log_simulator = LogSimulator('unit-test', 'localhost', ['/', '/section1'])
 
     # Test that the generated word has the right length and is only lowercase letters
     def test_generate_word(self):
